@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ishak IPTV Panel</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .container { background-color: #1e1e1e; padding: 20px; border-radius: 8px; display: inline-block; }
+        input, button { padding: 10px; font-size: 16px; margin: 10px; border-radius: 4px; border: none; }
+        button { background-color: #00e676; color: black; font-weight: bold; cursor: pointer; }
+        textarea { width: 400px; height: 250px; background-color: #333; color: #00e676; padding: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Ishak IPTV Code Generator</h2>
+        <p>Enter number of accounts:</p>
+        <input type="number" id="num" value="10">
+        <br>
+        <button onclick="start()">Generate Codes Now</button>
+        <br>
+        <textarea id="output" readonly placeholder="Your generated codes will appear here..."></textarea>
+    </div>
+
+    <script>
+        function start() {
+            var count = document.getElementById('num').value;
+            var list = [];
+            for (var i = 1; i <= count; i++) {
+                var id = Math.floor(1000 + Math.random() * 9000);
+                var pass = Math.random().toString(36).substring(2, 7);
+                list.push({
+                    "username": "ishak_" + id,
+                    "password": "pass_" + pass,
+                    "playlist": "https://github.io"
+                });
+            }
+            document.getElementById('output').value = JSON.stringify(list, null, 2);
+        }
+    </script>
+
+</body>
+</html>
