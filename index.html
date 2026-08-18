@@ -1,11 +1,9 @@
-
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Premium Control Panel</title>
-    <!-- Firebase Libraries from Google -->
+    <title>IPTV Premium Cloud Control Panel</title>
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <style>
@@ -29,7 +27,9 @@
     
     <label style="display:block; text-align:left; margin-bottom:5px; color:#cbd5e1;">Select Plan Duration:</label>
     <select id="duration">
+        <option value="0.0416">24 Hours Free Trial - Test Quality</option>
         <option value="1">1 Month (30 Days) - Full HD Quality</option>
+        <option value="3">3 Months (90 Days) - Premium VIP Quality</option>
         <option value="6">6 Months (180 Days) - 4K VIP Quality</option>
         <option value="12">12 Months (365 Days) - 4K Ultra VIP</option>
     </select>
@@ -40,23 +40,15 @@
 </div>
 
 <script>
-// --- Firebase Config Linked To Your European Server ---
 const firebaseConfig = {
     databaseURL: "https://firebasedatabase.app"
 };
 
-// Initialize Firebase
-let isFirebaseReady = false;
-try {
-    firebase.initializeApp(firebaseConfig);
-    var database = firebase.database();
-    isFirebaseReady = true;
-} catch (e) {
-    console.log("Offline mode active.");
-}
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 function generateAndSaveCode() {
-    const duration = document.getElementById('duration').value;
+    const duration = parseFloat(document.getElementById('duration').value);
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let part1 = '', part2 = '';
     
@@ -68,8 +60,13 @@ function generateAndSaveCode() {
     const finalCode = `ISHAK-${part1}-${part2}`;
     
     const expireDate = new Date();
-    expireDate.setDate(expireDate.getDate() + (duration * 30));
-    const formattedDate = expireDate.toISOString().split('T')[0];
+    if (duration < 1) {
+        expireDate.setHours(expireDate.getHours() + 24);
+    } else {
+        expireDate.setDate(expireDate.getDate() + (duration * 30));
+    }
+    
+    const formattedDate = expireDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
     const codeData = {
         status: "unused",
@@ -78,32 +75,18 @@ function generateAndSaveCode() {
         activated_at: ""
     };
 
-    const outputDiv = document.getElementById('output');
-    outputDiv.style.display = 'block';
-
-    if (isFirebaseReady) {
-        database.ref('iptv_codes/' + finalCode).set(codeData)
-        .then(() => {
-            outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
-        })
-        .catch((error) => {
-            saveToLocalFallback(finalCode, formattedDate);
-        });
-    } else {
-        saveToLocalFallback(finalCode, formattedDate);
-    }
-}
-
-function saveToLocalFallback(code, date) {
-    let localCodes = JSON.parse(localStorage.getItem('iptv_codes')) || {};
-    localCodes[code] = { status: "unused", expire_at: date };
-    localStorage.setItem('iptv_codes', JSON.stringify(localCodes));
-    
-    const outputDiv = document.getElementById('output');
-    outputDiv.innerHTML = `Generated Successfully (Offline Mode)! 💻<br><span style="color:#fff;">CODE:</span> ${code}<br><span class="date">Expires on: ${date}</span>`;
+    database.ref('iptv_codes/' + finalCode).set(codeData)
+    .then(() => {
+        const outputDiv = document.getElementById('output');
+        outputDiv.style.display = 'block';
+        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
+    })
+    .catch((error) => {
+        alert("Connection Error: " + error.message);
+    });
 }
 </script>
 
 </body>
 </html>
-         
+
