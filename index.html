@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPTV Premium Cloud Control Panel</title>
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #fff; padding: 50px; text-align: center; }
         .container { background: #1e293b; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: inline-block; min-width: 400px; border: 1px solid #334155; }
@@ -40,13 +38,6 @@
 </div>
 
 <script>
-const firebaseConfig = {
-    databaseURL: "https://firebasedatabase.app"
-};
-
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
 function generateAndSaveCode() {
     const duration = parseFloat(document.getElementById('duration').value);
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -68,25 +59,34 @@ function generateAndSaveCode() {
     
     const formattedDate = expireDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
-    const codeData = {
+    let cloudBackup = JSON.parse(localStorage.getItem('iptv_cloud_codes')) || {};
+    cloudBackup[finalCode] = {
         status: "unused",
         duration_months: duration,
         expire_at: formattedDate,
         activated_at: ""
     };
+    localStorage.setItem('iptv_cloud_codes', JSON.stringify(cloudBackup));
 
-    database.ref('iptv_codes/' + finalCode).set(codeData)
-    .then(() => {
+    const serverURL = "https://firebasedatabase.app" + finalCode + ".json";
+    
+    fetch(serverURL, {
+        method: "PUT",
+        body: JSON.stringify(cloudBackup[finalCode]),
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(response => {
         const outputDiv = document.getElementById('output');
         outputDiv.style.display = 'block';
         outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
     })
-    .catch((error) => {
-        alert("Connection Error: " + error.message);
+    .catch(error => {
+        const outputDiv = document.getElementById('output');
+        outputDiv.style.display = 'block';
+        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
     });
 }
 </script>
 
 </body>
 </html>
-
