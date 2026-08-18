@@ -1,44 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ishak IPTV Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Premium Control Panel</title>
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
     <style>
-        body { background-color: #121212; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
-        .container { background-color: #1e1e1e; padding: 20px; border-radius: 8px; display: inline-block; }
-        input, button { padding: 10px; font-size: 16px; margin: 10px; border-radius: 4px; border: none; }
-        button { background-color: #00e676; color: black; font-weight: bold; cursor: pointer; }
-        textarea { width: 400px; height: 250px; background-color: #333; color: #00e676; padding: 10px; font-family: monospace; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #fff; padding: 30px 15px; text-align: center; }
+        .container { background: #1e293b; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: inline-block; width: 100%; max-width: 400px; box-sizing: border-box; border: 1px solid #334155; }
+        h1 { color: #38bdf8; margin-bottom: 5px; font-size: 24px; }
+        p { color: #94a3b8; font-size: 13px; margin-bottom: 25px; }
+        select, button { padding: 12px; font-size: 16px; margin: 10px 0; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        select { background: #334155; color: white; border: 1px solid #475569; }
+        button { background-color: #0284c7; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #0369a1; }
+        .result { margin-top: 25px; padding: 20px; background: #0f172a; border-radius: 8px; font-size: 18px; font-weight: bold; color: #22c55e; border: 1px solid #1e293b; word-break: break-all; }
+        .date { font-size: 13px; color: #94a3b8; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Ishak IPTV Code Generator</h2>
-        <p>Enter number of accounts:</p>
-        <input type="number" id="num" value="10">
-        <br>
-        <button onclick="start()">Generate Codes Now</button>
-        <br>
-        <textarea id="output" readonly placeholder="Your generated codes will appear here..."></textarea>
-    </div>
+<div class="container">
+    <h1>🚀 IPTV Smart Code Generator</h1>
+    <p>Cloud Control Panel Connected to Application & Database</p>
+    
+    <label style="display:block; text-align:left; margin-bottom:5px; color:#cbd5e1;">Select Plan Duration:</label>
+    <select id="duration">
+        <option value="1">1 Month (30 Days) - Full HD Quality</option>
+        <option value="6">6 Months (180 Days) - 4K VIP Quality</option>
+        <option value="12">12 Months (365 Days) - 4K Ultra VIP</option>
+    </select>
+    
+    <button onclick="generateAndSaveCode()">Generate & Save Code 🔑</button>
+    
+    <div id="output" class="result" style="display:none;"></div>
+</div>
 
-    <script>
-        function start() {
-            var count = document.getElementById('num').value;
-            var list = [];
-            for (var i = 1; i <= count; i++) {
-                var id = Math.floor(1000 + Math.random() * 9000);
-                var pass = Math.random().toString(36).substring(2, 7);
-                list.push({
-                    "username": "ishak_" + id,
-                    "password": "pass_" + pass,
-                    "playlist": "https://github.io"
-                });
-            }
-            document.getElementById('output').value = JSON.stringify(list, null, 2);
-        }
-    </script>
+<script>
+const firebaseConfig = {
+    databaseURL: "https://firebaseio.com" 
+};
+
+let isFirebaseReady = false;
+try {
+    firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
+    isFirebaseReady = true;
+} catch (e) {
+    console.log("Offline mode active.");
+}
+
+function generateAndSaveCode() {
+    const duration = document.getElementById('duration').value;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let part1 = '', part2 = '';
+    
+    for (let i = 0; i < 4; i++) {
+        part1 += chars.charAt(Math.floor(Math.random() * chars.length));
+        part2 += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    const finalCode = `ISHAK-${part1}-${part2}`;
+    
+    const expireDate = new Date();
+    expireDate.setDate(expireDate.getDate() + (duration * 30));
+    const formattedDate = expireDate.toISOString().split('T')[0];
+    
+    const codeData = {
+        status: "unused",
+        duration_months: duration,
+        expire_at: formattedDate,
+        activated_at: ""
+    };
+
+    const outputDiv = document.getElementById('output');
+    outputDiv.style.display = 'block';
+
+    if (isFirebaseReady) {
+        database.ref('iptv_codes/' + finalCode).set(codeData)
+        .then(() => {
+            outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
+        })
+        .catch((error) => {
+            saveToLocalFallback(finalCode, formattedDate);
+        });
+    } else {
+        saveToLocalFallback(finalCode, formattedDate);
+    }
+}
+
+function saveToLocalFallback(code, date) {
+    let localCodes = JSON.parse(localStorage.getItem('iptv_codes')) || {};
+    localCodes[code] = { status: "unused", expire_at: date };
+    localStorage.setItem('iptv_codes', JSON.stringify(localCodes));
+    
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = `Generated Successfully (Offline Mode)! 💻<br><span style="color:#fff;">CODE:</span> ${code}<br><span class="date">Expires on: ${date}</span>`;
+}
+</script>
 
 </body>
 </html>
