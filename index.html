@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Premium Cloud Control Panel</title>
+    <title>IPTV Premium Control Panel</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #fff; padding: 50px; text-align: center; }
         .container { background: #1e293b; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: inline-block; min-width: 400px; border: 1px solid #334155; }
@@ -25,11 +25,11 @@
     
     <label style="display:block; text-align:left; margin-bottom:5px; color:#cbd5e1;">Select Plan Duration:</label>
     <select id="duration">
-        <option value="0.0416">24 Hours Free Trial - Test Quality</option>
-        <option value="1">1 Month (30 Days) - Full HD Quality</option>
-        <option value="3">3 Months (90 Days) - Premium VIP Quality</option>
-        <option value="6">6 Months (180 Days) - 4K VIP Quality</option>
-        <option value="12">12 Months (365 Days) - 4K Ultra VIP</option>
+        <option value="24h">24 Hours Free Trial - Test Quality</option>
+        <option value="1m">1 Month (30 Days) - Full HD Quality</option>
+        <option value="3m">3 Months (90 Days) - Premium VIP Quality</option>
+        <option value="6m">6 Months (180 Days) - 4K VIP Quality</option>
+        <option value="12m">12 Months (365 Days) - 4K Ultra VIP</option>
     </select>
     
     <button onclick="generateAndSaveCode()">Generate & Save Code 🔑</button>
@@ -39,7 +39,7 @@
 
 <script>
 function generateAndSaveCode() {
-    const duration = parseFloat(document.getElementById('duration').value);
+    const duration = document.getElementById('duration').value;
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let part1 = '', part2 = '';
     
@@ -51,40 +51,31 @@ function generateAndSaveCode() {
     const finalCode = `ISHAK-${part1}-${part2}`;
     
     const expireDate = new Date();
-    if (duration < 1) {
+    if (duration === "24h") {
         expireDate.setHours(expireDate.getHours() + 24);
-    } else {
-        expireDate.setDate(expireDate.getDate() + (duration * 30));
+    } else if (duration === "1m") {
+        expireDate.setDate(expireDate.getDate() + 30);
+    } else if (duration === "3m") {
+        expireDate.setDate(expireDate.getDate() + 90);
+    } else if (duration === "6m") {
+        expireDate.setDate(expireDate.getDate() + 180);
+    } else if (duration === "12m") {
+        expireDate.setDate(expireDate.getDate() + 365);
     }
     
     const formattedDate = expireDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
-    let cloudBackup = JSON.parse(localStorage.getItem('iptv_cloud_codes')) || {};
-    cloudBackup[finalCode] = {
-        status: "unused",
-        duration_months: duration,
-        expire_at: formattedDate,
-        activated_at: ""
-    };
-    localStorage.setItem('iptv_cloud_codes', JSON.stringify(cloudBackup));
-
-    const serverURL = "https://firebasedatabase.app" + finalCode + ".json";
+    const outputDiv = document.getElementById('output');
+    outputDiv.style.display = 'block';
+    outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
     
+    // إرسال كود فوري ومستقر للسيرفر بدون أي تأخير للمتصفح
+    const serverURL = "https://firebasedatabase.app" + finalCode + ".json";
     fetch(serverURL, {
         method: "PUT",
-        body: JSON.stringify(cloudBackup[finalCode]),
+        body: JSON.stringify({ status: "unused", expire_at: formattedDate, duration: duration }),
         headers: { "Content-Type": "application/json" }
-    })
-    .then(response => {
-        const outputDiv = document.getElementById('output');
-        outputDiv.style.display = 'block';
-        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
-    })
-    .catch(error => {
-        const outputDiv = document.getElementById('output');
-        outputDiv.style.display = 'block';
-        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
-    });
+    }).catch(e => console.log(e));
 }
 </script>
 
