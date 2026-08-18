@@ -70,7 +70,7 @@ function generateAndSaveCode() {
     outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE:</span> ${finalCode}<br><span class="date">Expires on: ${formattedDate}</span>`;
     
     // إرسال كود فوري ومستقر للسيرفر بدون أي تأخير للمتصفح
-    const serverURL = "https://firebasedatabase.app" + finalCode + ".json";
+    cconst serverURL = `https://firebasedatabase.app{finalCode}.json`;
     fetch(serverURL, {
         method: "PUT",
         body: JSON.stringify({ status: "unused", expire_at: formattedDate, duration: duration }),
