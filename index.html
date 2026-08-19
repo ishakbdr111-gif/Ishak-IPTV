@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Smart Code Generator</title>
+    <title>IPTV Premium Code Generator</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,10 +35,10 @@
         }
         h1 { font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         p { font-size: 14px; color: #ddd; margin-bottom: 25px; }
-        label { display: block; text-align: left; margin-bottom: 8px; font-weight: bold; }
+        label { display: block; text-align: left; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
         select {
             width: 100%; padding: 12px; border-radius: 8px; border: none;
-            background: rgba(255, 255, 255, 0.2); color: #fff; font-size: 16px; margin-bottom: 20px; outline: none;
+            background: rgba(255, 255, 255, 0.2); color: #fff; font-size: 15px; margin-bottom: 20px; outline: none;
         }
         select option { background: #2b1055; color: #fff; }
         button {
@@ -55,14 +55,23 @@
 <body>
 
 <div class="container">
-    <h1>🚀 IPTV Smart Code Generator</h1>
+    <h1>🚀 IPTV Premium Code Generator</h1>
     <p>Cloud Control Panel Connected to Application & Database</p>
     
     <label for="duration">Select Plan Duration:</label>
     <select id="duration">
-        <option value="1m">1 Month (30 Days) - Full HD Quality</option>
-        <option value="6m">6 Months (180 Days) - Premium Plan</option>
-        <option value="12m">12 Months (365 Days) - Ultimate Plan</option>
+        <option value="24h">24 Hours - Trial Plan 🧪</option>
+        <option value="1m">1 Month (30 Days) - Standard Plan 📅</option>
+        <option value="3m">3 Months (90 Days) - Quarterly Plan 🌟</option>
+        <option value="6m">6 Months (180 Days) - Premium Plan 🔥</option>
+        <option value="12m">12 Months (365 Days) - Ultimate Plan 👑</option>
+    </select>
+
+    <label for="quality">Select Streaming Quality:</label>
+    <select id="quality">
+        <option value="HD">HD Quality (Standard resolution)</option>
+        <option value="Full HD">Full HD Quality (High definition)</option>
+        <option value="4K">4K Ultra HD Quality (Premium resolution)</option>
     </select>
     
     <button onclick="generateAndSaveCode()">Generate & Save Code 🔑</button>
@@ -82,43 +91,50 @@ function generateRandomCode() {
 
 function generateAndSaveCode() {
     const duration = document.getElementById('duration').value;
+    const quality = document.getElementById('quality').value;
     const finalCode = generateRandomCode();
     let expiredDate = new Date();
     
-    if (duration === "1m") { expiredDate.setDate(expiredDate.getDate() + 30); }
+    // حساب التواريخ بدقة بناءً على طلبك الجديد
+    if (duration === "24h") { expiredDate.setHours(expiredDate.getHours() + 24); }
+    else if (duration === "1m") { expiredDate.setDate(expiredDate.getDate() + 30); }
+    else if (duration === "3m") { expiredDate.setDate(expiredDate.getDate() + 90); }
     else if (duration === "6m") { expiredDate.setDate(expiredDate.getDate() + 180); }
     else if (duration === "12m") { expiredDate.setDate(expiredDate.getDate() + 365); }
     
     const formattedDate = expiredDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
-    // تم تعديل الرابط بدقة واختصاره ليتوافق مجبراً مع خادم Firebase بدون شروط مسبقة
+    // الرابط المصلح والمقترن بالمسار الفرعي للمشروع الأوروبي لربط البيانات بنجاح
     const serverURL = `https://firebasedatabase.app{finalCode}.json`;
     
     fetch(serverURL, {
-        method: "PATCH", // دالة التعديل المباشر المفتوح لتخطي الحظر الأمني لقواعد البيانات
+        method: "PUT",
         headers: { 
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
             status: "unused", 
             expire_at: formattedDate, 
-            duration: duration 
+            duration: duration,
+            quality: quality
         })
     })
     .then(response => {
-        if (!response.ok) throw new Error('Network error');
-        
-        // إظهار لوحة النجاح مباشرة للمستخدم بعد إرسال الطلب بنجاح
+        // فحص الاستجابة أولاً بشكل صحيح (تصحيح الخطأ المنطقي القديم)
+        if (!response.ok) {
+            throw new Error('Database connection failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // تحديث واجهة المستخدم باللون الأخضر فقط بعد إتمام الحفظ الفعلي بنجاح
         const outputDiv = document.getElementById('output');
         outputDiv.style.display = 'block';
-        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Expires on: ${formattedDate}`;
+        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Quality: <b style="color:#00c6ff;">${quality}</b><br>Expires on: ${formattedDate}`;
     })
     .catch(e => {
-        // تخطي رسائل التنبيه المزعجة وإظهار الكود للمستخدم في كل الأحوال لإنهاء التوقف الحالي
-        const outputDiv = document.getElementById('output');
-        outputDiv.style.display = 'block';
-        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Expires on: ${formattedDate}`;
-        console.log("Firebase bypass sync active.");
+        alert("حدث خطأ أثناء الحفظ! تأكد من تفعيل الـ Rules في حسابك.");
+        console.error("Error:", e);
     });
 }
 </script>
