@@ -103,7 +103,7 @@ function generateAndSaveCode() {
     
     const formattedDate = expiredDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
-    // العودة للمسار الرئيسي القديم المضمون والمفتوح في الـ Rules
+    // الرابط الرئيسي الصحيح والمفتوح في الـ Rules بدون مجلدات فرعية مكسورة
     const serverURL = `https://firebasedatabase.app{finalCode}.json`;
     
     fetch(serverURL, {
