@@ -95,7 +95,6 @@ function generateAndSaveCode() {
     const finalCode = generateRandomCode();
     let expiredDate = new Date();
     
-    // حساب التواريخ بدقة بناءً على طلبك الجديد
     if (duration === "24h") { expiredDate.setHours(expiredDate.getHours() + 24); }
     else if (duration === "1m") { expiredDate.setDate(expiredDate.getDate() + 30); }
     else if (duration === "3m") { expiredDate.setDate(expiredDate.getDate() + 90); }
@@ -104,7 +103,7 @@ function generateAndSaveCode() {
     
     const formattedDate = expiredDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
-    // الرابط المصلح والمقترن بالمسار الفرعي للمشروع الأوروبي لربط البيانات بنجاح
+    // العودة للمسار الرئيسي القديم المضمون والمفتوح في الـ Rules
     const serverURL = `https://firebasedatabase.app{finalCode}.json`;
     
     fetch(serverURL, {
@@ -120,14 +119,12 @@ function generateAndSaveCode() {
         })
     })
     .then(response => {
-        // فحص الاستجابة أولاً بشكل صحيح (تصحيح الخطأ المنطقي القديم)
         if (!response.ok) {
             throw new Error('Database connection failed');
         }
         return response.json();
     })
     .then(data => {
-        // تحديث واجهة المستخدم باللون الأخضر فقط بعد إتمام الحفظ الفعلي بنجاح
         const outputDiv = document.getElementById('output');
         outputDiv.style.display = 'block';
         outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Quality: <b style="color:#00c6ff;">${quality}</b><br>Expires on: ${formattedDate}`;
