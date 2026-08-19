@@ -86,7 +86,7 @@ function generateRandomCode() {
     for (let i = 0; i < 5; i++) segment1 += chars.charAt(Math.floor(Math.random() * chars.length));
     for (let i = 0; i < 4; i++) segment2 += chars.charAt(Math.floor(Math.random() * chars.length));
     for (let i = 0; i < 4; i++) segment3 += chars.charAt(Math.floor(Math.random() * chars.length));
-    return `ISHAK-${segment1}-${segment2}-${segment3}`;
+    return "ISHAK-" + segment1 + "-" + segment2 + "-" + segment3;
 }
 
 function generateAndSaveCode() {
@@ -95,7 +95,6 @@ function generateAndSaveCode() {
     const finalCode = generateRandomCode();
     let expiredDate = new Date();
     
-    // حساب دقيق لكل المدد المطلوبة
     if (duration === "24h") { expiredDate.setHours(expiredDate.getHours() + 24); }
     else if (duration === "1m") { expiredDate.setDate(expiredDate.getDate() + 30); }
     else if (duration === "3m") { expiredDate.setDate(expiredDate.getDate() + 90); }
@@ -104,21 +103,13 @@ function generateAndSaveCode() {
     
     const formattedDate = expiredDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
     
-    // إظهار واجهة النجاح الخضراء للمستخدم فوراً وبشكل قاطع بدون شروط
-    const outputDiv = document.getElementById('output');
-    outputDiv.style.display = 'block';
-    outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Quality: <b style="color:#00c6ff;">${quality}</b><br>Expires on: ${formattedDate}`;
-
-    // رابط السيرفر الأوروبي الرسمي لمشروعك
-    const serverURL = `https://firebasedatabase.app{finalCode}.json`;
+    // الرابط المأخوذ حرفياً بالدمج النصي الصافي من شاشة Firebase لتفادي مشكلة الـ null
+    const serverURL = "https://firebasedatabase.app" + finalCode + ".json";
     
-    // إرسال البيانات للخلفية بشكل متوافق وآمن رغماً عن المتصفح
     fetch(serverURL, {
         method: "PUT",
-        mode: "cors",
         headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
             status: "unused", 
@@ -127,11 +118,20 @@ function generateAndSaveCode() {
             quality: quality
         })
     })
-    .then(res => res.json())
-    .then(data => console.log("Cloud database synchronized."))
-    .catch(err => {
-        // حماية السكريبت من الانهيار الأمني لضمان عدم توقف الواجهة الخضراء أبداً
-        console.warn("Bypass mode active:", err);
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Database connection failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const outputDiv = document.getElementById('output');
+        outputDiv.style.display = 'block';
+        outputDiv.innerHTML = "Saved to Cloud Successfully! 🎉<br><span style='color:#fff;'>CODE: </span><span class='code-highlight'>" + finalCode + "</span><br>Quality: <b style='color:#00c6ff;'>" + quality + "</b><br>Expires on: " + formattedDate;
+    })
+    .catch(e => {
+        alert("حدث خطأ أثناء الحفظ! تأكد من تفعيل الـ Rules في حسابك.");
+        console.error("Error:", e);
     });
 }
 </script>
