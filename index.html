@@ -33,72 +33,23 @@
             max-width: 450px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        p {
-            font-size: 14px;
-            color: #ddd;
-            margin-bottom: 25px;
-        }
-        label {
-            display: block;
-            text-align: left;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+        h1 { font-size: 24px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        p { font-size: 14px; color: #ddd; margin-bottom: 25px; }
+        label { display: block; text-align: left; margin-bottom: 8px; font-weight: bold; }
         select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 20px;
-            outline: none;
+            width: 100%; padding: 12px; border-radius: 8px; border: none;
+            background: rgba(255, 255, 255, 0.2); color: #fff; font-size: 16px; margin-bottom: 20px; outline: none;
         }
-        select option {
-            background: #2b1055;
-            color: #fff;
-        }
+        select option { background: #2b1055; color: #fff; }
         button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            background: #00c6ff;
-            background: -webkit-linear-gradient(to right, #0072ff, #00c6ff);
-            background: linear-gradient(to right, #0072ff, #00c6ff);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            background: linear-gradient(to right, #0072ff, #00c6ff); color: white;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
-        }
-        #output {
-            margin-top: 25px;
-            padding: 15px;
-            background: rgba(0, 200, 83, 0.2);
-            border: 1px solid #00c853;
-            border-radius: 8px;
-            display: none;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .code-highlight {
-            font-weight: bold;
-            color: #00e676;
-            font-family: monospace;
-            font-size: 18px;
-        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
+        #output { margin-top: 25px; padding: 15px; background: rgba(0, 200, 83, 0.2); border: 1px solid #00c853; border-radius: 8px; display: none; font-size: 16px; line-height: 1.6; }
+        .code-highlight { font-weight: bold; color: #00e676; font-family: monospace; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -106,30 +57,23 @@
 <div class="container">
     <h1>🚀 IPTV Smart Code Generator</h1>
     <p>Cloud Control Panel Connected to Application & Database</p>
-    
     <label for="duration">Select Plan Duration:</label>
     <select id="duration">
         <option value="1m">1 Month (30 Days) - Full HD Quality</option>
         <option value="6m">6 Months (180 Days) - Premium Plan</option>
         <option value="12m">12 Months (365 Days) - Ultimate Plan</option>
     </select>
-    
     <button onclick="generateAndSaveCode()">Generate & Save Code 🔑</button>
-    
     <div id="output"></div>
 </div>
 
 <script>
 function generateRandomCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let segment1 = '';
-    let segment2 = '';
-    let segment3 = '';
-    
+    let segment1 = ''; let segment2 = ''; let segment3 = '';
     for (let i = 0; i < 5; i++) segment1 += chars.charAt(Math.floor(Math.random() * chars.length));
     for (let i = 0; i < 4; i++) segment2 += chars.charAt(Math.floor(Math.random() * chars.length));
     for (let i = 0; i < 4; i++) segment3 += chars.charAt(Math.floor(Math.random() * chars.length));
-    
     return `ISHAK-${segment1}-${segment2}-${segment3}`;
 }
 
@@ -138,41 +82,28 @@ function generateAndSaveCode() {
     const finalCode = generateRandomCode();
     let expiredDate = new Date();
     
-    if (duration === "1m") {
-        expiredDate.setDate(expiredDate.getDate() + 30);
-    } else if (duration === "6m") {
-        expiredDate.setDate(expiredDate.getDate() + 180);
-    } else if (duration === "12m") {
-        expiredDate.setDate(expiredDate.getDate() + 365);
-    }
+    if (duration === "1m") { expiredDate.setDate(expiredDate.getDate() + 30); }
+    else if (duration === "6m") { expiredDate.setDate(expiredDate.getDate() + 180); }
+    else if (duration === "12m") { expiredDate.setDate(expiredDate.getDate() + 365); }
     
     const formattedDate = expiredDate.toLocaleString('en-US', { timeZone: 'Africa/Algiers' });
-    
-    const outputDiv = document.getElementById('output');
-    outputDiv.style.display = 'block';
-    outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Expires on: ${formattedDate}`;
-    
-    // رابط السيرفر الأوروبي الصحيح الخاص بك
     const serverURL = `https://firebasedatabase.app{finalCode}.json`;
     
     fetch(serverURL, {
         method: "PUT",
-        body: JSON.stringify({ 
-            status: "unused", 
-            expire_at: formattedDate, 
-            duration: duration 
-        }),
-        headers: { 
-            "Content-Type": "application/json" 
-        }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "unused", expire_at: formattedDate, duration: duration })
     })
     .then(response => {
         if (!response.ok) throw new Error('Network error');
-        console.log("Data saved successfully directly to Firebase!");
+        const outputDiv = document.getElementById('output');
+        outputDiv.style.display = 'block';
+        outputDiv.innerHTML = `Saved to Cloud Successfully! 🎉<br><span style="color:#fff;">CODE: </span><span class="code-highlight">${finalCode}</span><br>Expires on: ${formattedDate}`;
     })
-    .catch(e => console.error("Error saving data:", e));
+    .catch(e => {
+        alert("حدث خطأ، تأكد من تحديث القواعد في Firebase!");
+    });
 }
 </script>
-
 </body>
 </html>
